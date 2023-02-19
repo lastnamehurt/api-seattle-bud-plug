@@ -7,7 +7,7 @@ run:
 
 release:
   image: web
-  command: docker-compose up
+  command:
+    - docker-compose up
   ports:
     - "${PORT:-8000}:8000"
-
