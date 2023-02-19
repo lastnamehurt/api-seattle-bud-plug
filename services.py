@@ -3,7 +3,7 @@ import requests
 import redis 
 import pickle
 
-redis_url = os.environ.get("redis://redis:6379", "redis://redis:6379")
+redis_url = os.environ.get("REDIS_URL", "redis://:pe0c9599ef23a3ef81ec5489038a1b9225b7fa21adf5c7aff295dc2cc32b88e0c@ec2-44-205-74-123.compute-1.amazonaws.com:26119")
 redis_client = redis.from_url(redis_url)
 
 class SearchService:
