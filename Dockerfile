@@ -1,11 +1,12 @@
-FROM redis:latest
+FROM python:3.9
 
 WORKDIR /app
-
 COPY requirements.txt .
-RUN apt-get update && apt-get install -y python3 python3-pip
-RUN pip3 install -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . .
+
+ENV REDIS_URL redis://redis:6379
+EXPOSE 8000
 
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "${PORT:-8000}"]

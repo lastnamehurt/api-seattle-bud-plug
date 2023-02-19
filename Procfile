@@ -1,0 +1,2 @@
+web: docker-compose up
+
