@@ -1,0 +1,13 @@
+build:
+  docker:
+    web: docker-compose build
+
+release:
+  image: web
+  command:
+    - docker-compose up
+  ports:
+    - $PORT:8000
+  environment:
+    REDIS_URL: redis://redis:6379
+
