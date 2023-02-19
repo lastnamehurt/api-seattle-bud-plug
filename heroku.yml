@@ -4,4 +4,7 @@ build:
 
 run:
   web: uvicorn api:app --host 0.0.0.0 --port $PORT
-  redis: redis-server --bind 0.0.0.0 --port 6379
+  redis:
+    command:
+      - redis-server --bind 0.0.0.0 --port 6379
+    image: redis:latest
