@@ -7,4 +7,4 @@ run:
   redis:
     image: redis:latest
     command:
-      - redis-server --bind 0.0.0.0 --port 6379
+      - redis-server --bind 0.0.0.0 --port $REDIS_PORT
