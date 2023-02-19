@@ -8,11 +8,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+# Configure CORS settings
 origins = [
+    "https://seattle-bud-plug.herokuapp.com",
     "http://localhost",
     "http://localhost:3000",
-    "https://your-seattle-plug.herokuapp.com",
-    "https://seattle-bud-plug.herokuapp.com/"
 ]
 
 app.add_middleware(
@@ -22,6 +22,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 
