@@ -2,11 +2,13 @@ build:
   docker:
     web: docker-compose build
 
+setup:
+  config:
+    REDIS_URL: redis://redis:6379
+
+run:
+  web: echo "Setting up Docker..."
+
 release:
   image: web
-  command:
-    - docker-compose up
-  ports:
-    - $PORT:8000
-  environment:
-    REDIS_URL: redis://redis:6379
+  command: docker-compose up
