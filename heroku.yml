@@ -11,4 +11,5 @@ run:
 
 release:
   image: web
-  command: docker-compose up
+  command:
+    - docker-compose up
