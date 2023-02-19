@@ -11,6 +11,8 @@ app = FastAPI()
 origins = [
     "http://localhost",
     "http://localhost:3000",
+    "https://your-seattle-plug.herokuapp.com",
+    "https://seattle-bud-plug.herokuapp.com/"
 ]
 
 app.add_middleware(
