@@ -1,4 +1,5 @@
 fastapi
+aioredis
 redis
 requests
 uvicorn

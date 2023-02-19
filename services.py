@@ -1,6 +1,6 @@
 import os
 import requests
-import redis
+import redis 
 import pickle
 
 redis_url = os.environ.get("redis://redis:6379", "redis://redis:6379")
