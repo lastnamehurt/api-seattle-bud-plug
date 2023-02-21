@@ -39,7 +39,7 @@ heroku-push:
 	heroku container:push web
 
 # Release to Heroku
-heroku-push:
+heroku-release:
 	heroku container:release web
 
 # Pull from Heroku
