@@ -1,4 +1,5 @@
 import os
+import json
 import requests
 import redis 
 import pickle
@@ -20,22 +21,22 @@ class SearchService:
 
     def get_collection_items(self):
         collections = self.get_collections()
+        print(collections[0])
         for collection in collections:
-            self.store_redis(collection['items'])
+            self.store_redis(collection['name'], json.dumps(collection['items']))
             self.collection_items[collection['name']] = collection['items']
             self.raw_collection[collection['name']] = collection
     
     def parse_item_to_deal(self, item):
         return SearchParser().parse(item)
 
-    def store_redis(self, item):
-        pickled = pickle.dumps(item)
-        return self.redis.set(item['name'], pickled)
+    def store_redis(self, key, value):
+        pickled = pickle.dumps({key: value})
+        return self.redis.set(key, pickled)
 
     def load_from_redis(self, item_name):
-        pickled = self.redis.get(item_name)
-        item = pickle.loads(pickled)
-        return item 
+        item = self.redis.get(item_name)
+        return pickle.loads(item) 
 
     def run(self):
         deals = []
@@ -55,6 +56,7 @@ class SearchParser:
         
     def parse(self, item):
         parsed = {}
+        print(item)
         name = item['price']['product']['name']
         brand = item['price']['product']['brand']
         sale_price = item['sale_usd']
