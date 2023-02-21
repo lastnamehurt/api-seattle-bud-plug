@@ -10,6 +10,7 @@ class SearchService:
 
     def __init__(self, location = "Kemps") -> None:
         self.collection_items = {}
+        self.raw_collection = {}
         self.location = location
         self.url = "https://api.olla.co/v1/collections/?storeLocation=e6fc8d53-19ea-4ad6-9786-c85ba9381e7c&minimum&includeCollectionItems&limit=50&includeSalePrice"
         self.redis = redis_client
@@ -20,8 +21,9 @@ class SearchService:
     def get_collection_items(self):
         collections = self.get_collections()
         for collection in collections:
+            self.store_redis(collection['items'])
             self.collection_items[collection['name']] = collection['items']
-            self.store_redis(collection)
+            self.raw_collection[collection['name']] = collection
     
     def parse_item_to_deal(self, item):
         return SearchParser().parse(item)
