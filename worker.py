@@ -2,13 +2,9 @@
 import os
 import redis
 import time
-from app.services import SearchService
+from app.tasks import search_deals_task
 from rq import Worker, Queue, Connection
 from datetime import datetime, timedelta
-
-
-def my_task():
-    SearchService().run()
 
 
 # Set up the Redis connection and queue
@@ -36,7 +32,7 @@ while True:
     run_time = now + timedelta(seconds=interval)
 
     # Enqueue the task with arguments at the calculated time
-    job = q.enqueue_in(run_time, my_task)
+    job = q.enqueue_in(run_time, search_deals_task)
     print("Job enqueued with ID:", job.id)
 
     # Start the worker

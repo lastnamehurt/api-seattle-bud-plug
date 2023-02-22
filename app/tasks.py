@@ -1,5 +1,5 @@
-from app.services import SearchService
+from .services import SearchService
 
 
-def my_task():
+def search_deals_task():
     SearchService().run()
