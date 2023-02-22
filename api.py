@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.services import SearchService
+from services import SearchService
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
