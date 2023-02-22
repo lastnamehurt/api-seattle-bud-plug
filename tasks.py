@@ -1,4 +1,4 @@
-from .app.services import SearchService
+from services import SearchService
 
 
 def search_deals_task():
