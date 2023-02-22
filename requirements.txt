@@ -3,3 +3,4 @@ aioredis
 redis
 requests
 uvicorn
+rq
