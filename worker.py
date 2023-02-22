@@ -2,7 +2,7 @@
 import os
 import redis
 import time
-from app.tasks import search_deals_task
+from tasks import search_deals_task
 from rq import Worker, Queue, Connection
 from datetime import datetime, timedelta
 

@@ -14,7 +14,9 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "https://seattlebudplug.com",
+    "http://seattlebudplug.com",
     "https://www.seattlebudplug.com"
+    "http://www.seattlebudplug.com"
 ]
 
 app.add_middleware(
@@ -24,6 +26,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/api/deals/cached")
 async def get_cached_deals():
@@ -40,6 +43,7 @@ async def get_cached_deals():
                 data.append(service.parse_item_to_deal(item))
     return JSONResponse(content=data, media_type="application/json")
 
+
 @app.get("/api/deals")
 async def root():
     data = service.run()
@@ -53,6 +57,7 @@ async def get_value_from_redis(key: str):
         return {"message": "Key not found"}
     else:
         return {"key": key, "value": value}
+
 
 @app.get("/redis")
 async def get_all_values_from_redis():
