@@ -1,15 +1,18 @@
 import os
 import json
 import requests
-import redis 
+import redis
 import pickle
 
-redis_url = os.environ.get("REDIS_URL", "redis://:pe0c9599ef23a3ef81ec5489038a1b9225b7fa21adf5c7aff295dc2cc32b88e0c@ec2-44-205-74-123.compute-1.amazonaws.com:26119")
+redis_url = os.environ.get(
+    "REDIS_URL",
+    "redis://:pe0c9599ef23a3ef81ec5489038a1b9225b7fa21adf5c7aff295dc2cc32b88e0c@ec2-44-205-74-123.compute-1.amazonaws.com:26119",
+)
 redis_client = redis.from_url(redis_url)
 
-class SearchService:
 
-    def __init__(self, location = "Kemps") -> None:
+class SearchService:
+    def __init__(self, location="Kemps") -> None:
         self.collection_items = {}
         self.raw_collection = {}
         self.location = location
@@ -17,16 +20,16 @@ class SearchService:
         self.redis = redis_client
 
     def get_collections(self):
-        return requests.get(self.url).json()['collections']
+        return requests.get(self.url).json()["collections"]
 
     def get_collection_items(self):
         collections = self.get_collections()
         for collection in collections:
-            data = collection['items']
-            self.store_redis(collection['name'], json.dumps(data))
-            self.collection_items[collection['name']] = collection['items']
-            self.raw_collection[collection['name']] = collection
-    
+            data = collection["items"]
+            self.store_redis(collection["name"], json.dumps(data))
+            self.collection_items[collection["name"]] = collection["items"]
+            self.raw_collection[collection["name"]] = collection
+
     def parse_item_to_deal(self, item):
         return SearchParser().parse(item)
 
@@ -36,7 +39,7 @@ class SearchService:
 
     def load_from_redis(self, item_name):
         item = self.redis.get(item_name)
-        return pickle.loads(item) 
+        return pickle.loads(item)
 
     def run(self):
         deals = []
@@ -48,33 +51,32 @@ class SearchService:
 
 
 class SearchParser:
-
     def build_url(self, product_name, product_brand, product_id):
         product_name = "_".join(product_name.split())
         product_brand = "_".join(product_brand.split())
         return f"https://shop.kempscannabis.com/seattle/brand/{product_brand}/product/{product_name}?id={product_id}"
-        
+
     def parse(self, item):
         parsed = {}
-        name = item['price']['product']['name']
-        brand = item['price']['product']['brand']
-        sale_price = item['sale_usd']
-        amount_in_stock = item['price']['amount_in_stock']
-        weight = item['price']['weight']
-        thc_percentage = item['price']['thc_percentage']
-        cbd_percentage = item['price']['cbd_percentage']
-        category = item['price']['product']['subcategory']['category']['name']
-        item_type = item['price']['product']['subcategory']['name']
+        name = item["price"]["product"]["name"]
+        brand = item["price"]["product"]["brand"]
+        sale_price = item["sale_usd"]
+        amount_in_stock = item["price"]["amount_in_stock"]
+        weight = item["price"]["weight"]
+        thc_percentage = item["price"]["thc_percentage"]
+        cbd_percentage = item["price"]["cbd_percentage"]
+        category = item["price"]["product"]["subcategory"]["category"]["name"]
+        item_type = item["price"]["product"]["subcategory"]["name"]
         parsed[name] = {
-            'name': name,
-            'brand': brand,
-            'price': sale_price,
-            'url': self.build_url(name, brand, item['price']['product']['product_id']),
-            'amount_in_stock': amount_in_stock,
-            'thc_percentage': thc_percentage,
-            'cbd_percentage': cbd_percentage,
-            'weight': weight,
-            'category': category,
-            'type': item_type
+            "name": name,
+            "brand": brand,
+            "price": sale_price,
+            "url": self.build_url(name, brand, item["price"]["product"]["product_id"]),
+            "amount_in_stock": amount_in_stock,
+            "thc_percentage": thc_percentage,
+            "cbd_percentage": cbd_percentage,
+            "weight": weight,
+            "category": category,
+            "type": item_type,
         }
         return parsed

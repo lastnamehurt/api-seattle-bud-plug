@@ -15,8 +15,8 @@ origins = [
     "http://localhost:3000",
     "https://seattlebudplug.com",
     "http://seattlebudplug.com",
-    "https://www.seattlebudplug.com"
-    "http://www.seattlebudplug.com"
+    "https://www.seattlebudplug.com",
+    "http://www.seattlebudplug.com",
 ]
 
 app.add_middleware(
@@ -39,7 +39,7 @@ async def get_cached_deals():
     data = []
     for deal in deals:
         for _, products in deal.items():
-            for item in products.get('items', []):
+            for item in products.get("items", []):
                 data.append(service.parse_item_to_deal(item))
     return JSONResponse(content=data, media_type="application/json")
 

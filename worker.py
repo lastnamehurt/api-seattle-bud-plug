@@ -1,22 +1,19 @@
-
 import os
-import redis
 import time
-from tasks import search_deals_task
-from rq import Worker, Queue, Connection
 from datetime import datetime, timedelta
 
+import redis
+from rq import Connection, Queue, Worker
+from tasks import search_deals_task
 
 # Set up the Redis connection and queue
-redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
 conn = redis.from_url(redis_url)
 q = Queue(connection=conn)
 
-# Define a function to start the worker
-
 
 def start_worker():
-    listen = ['high', 'default', 'low']
+    listen = ["high", "default", "low"]
     with Connection(conn):
         worker = Worker(map(Queue, listen))
         worker.work()
