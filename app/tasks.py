@@ -5,8 +5,8 @@ from rq import Queue
 from datetime import datetime, timedelta
 
 # Define a function that performs a task
-def my_task(x, y):
-    return x + y
+def my_task():
+    SearchService().run()
 
 # Set up the Redis connection and queue
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
@@ -23,8 +23,9 @@ while True:
     run_time = now + timedelta(seconds=interval)
 
     # Enqueue the task with arguments at the calculated time
-    job = q.enqueue_in(run_time, my_task, 1, 2)
+    job = q.enqueue_in(run_time, my_task)
     print("Job enqueued with ID:", job.id)
 
     # Wait for the specified interval
     time.sleep(interval)
+
