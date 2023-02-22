@@ -3,8 +3,4 @@ build:
     web: Dockerfile
 
 run:
-  web: uvicorn app.api:app --app-dir app --reload --host 0.0.0.0 --port $PORT
-  redis:
-    image: redis
-    command:
-      - redis-server --bind 0.0.0.0 --port 6379
+  web: docker-compose up
