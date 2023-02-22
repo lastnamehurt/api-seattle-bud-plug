@@ -10,13 +10,13 @@ app = FastAPI()
 
 # Configure CORS settings
 origins = [
-    "https://seattle-bud-plug.herokuapp.com",
     "http://localhost",
     "http://localhost:3000",
-    "https://seattlebudplug.com",
-    "http://seattlebudplug.com",
-    "https://www.seattlebudplug.com",
     "http://www.seattlebudplug.com",
+    "http://seattlebudplug.com",
+    "https://seattlebudplug.com",
+    "https://www.seattlebudplug.com",
+    "https://seattle-bud-plug.herokuapp.com",
 ]
 
 app.add_middleware(
@@ -35,13 +35,14 @@ async def get_cached_deals():
     for key in keys:
         value = service.load_from_redis(key)
         deals.append({key.decode(): value})
-
+    print(service.collection_items)
     data = []
+
     for deal in deals:
         for _, products in deal.items():
             for item in products.get("items", []):
                 data.append(service.parse_item_to_deal(item))
-    return JSONResponse(content=data, media_type="application/json")
+    return JSONResponse(content=service.collection_items, media_type="application/json")
 
 
 @app.get("/api/deals")

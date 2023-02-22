@@ -6,7 +6,7 @@ import pickle
 
 redis_url = os.environ.get(
     "REDIS_URL",
-    "redis://:pe0c9599ef23a3ef81ec5489038a1b9225b7fa21adf5c7aff295dc2cc32b88e0c@ec2-44-205-74-123.compute-1.amazonaws.com:26119",
+    f"{os.environ.get('REDISURL', '')}:26120",
 )
 redis_client = redis.from_url(redis_url)
 
@@ -15,6 +15,7 @@ class SearchService:
     def __init__(self, location="Kemps") -> None:
         self.collection_items = {}
         self.raw_collection = {}
+        self.parsed_items = []
         self.location = location
         self.url = "https://api.olla.co/v1/collections/?storeLocation=e6fc8d53-19ea-4ad6-9786-c85ba9381e7c&minimum&includeCollectionItems&limit=50&includeSalePrice"
         self.redis = redis_client
@@ -22,7 +23,7 @@ class SearchService:
     def get_collections(self):
         return requests.get(self.url).json()["collections"]
 
-    def get_collection_items(self):
+    def fetch_collections(self):
         collections = self.get_collections()
         for collection in collections:
             data = collection["items"]
@@ -33,6 +34,14 @@ class SearchService:
     def parse_item_to_deal(self, item):
         return SearchParser().parse(item)
 
+    def parse_items(self):
+        if not self.collection_items:
+            self.fetch_collections()
+        for brand, products in self.collection_items.items():
+            for product in products:
+                self.parsed_items.append(self.parse_item_to_deal(product))
+        return self.parsed_items
+
     def store_redis(self, key, value):
         pickled = pickle.dumps({key: value})
         return self.redis.set(key, pickled)
@@ -41,9 +50,15 @@ class SearchService:
         item = self.redis.get(item_name)
         return pickle.loads(item)
 
-    def run(self):
+    def run(self, use_cache=False):
+        if use_cache:
+            if not self.parsed_items:
+                self.parse_items()
+
+            return self.parsed_items
+
         deals = []
-        self.get_collection_items()
+        self.fetch_collections()
         for _, details in self.collection_items.items():
             for detail in details:
                 deals.append(self.parse_item_to_deal(detail))
@@ -67,7 +82,9 @@ class SearchParser:
         cbd_percentage = item["price"]["cbd_percentage"]
         category = item["price"]["product"]["subcategory"]["category"]["name"]
         item_type = item["price"]["product"]["subcategory"]["name"]
+        location_id = item["price"]["store_location_id"]
         parsed[name] = {
+            "id": item["id"],
             "name": name,
             "brand": brand,
             "price": sale_price,
@@ -78,5 +95,6 @@ class SearchParser:
             "weight": weight,
             "category": category,
             "type": item_type,
+            "location_id": location_id,
         }
         return parsed
