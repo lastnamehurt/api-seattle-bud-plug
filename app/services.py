@@ -21,9 +21,9 @@ class SearchService:
 
     def get_collection_items(self):
         collections = self.get_collections()
-        print(collections[0])
         for collection in collections:
-            self.store_redis(collection['name'], json.dumps(collection['items']))
+            data = collection['items']
+            self.store_redis(collection['name'], json.dumps(data))
             self.collection_items[collection['name']] = collection['items']
             self.raw_collection[collection['name']] = collection
     
@@ -56,7 +56,6 @@ class SearchParser:
         
     def parse(self, item):
         parsed = {}
-        print(item)
         name = item['price']['product']['name']
         brand = item['price']['product']['brand']
         sale_price = item['sale_usd']
@@ -67,6 +66,7 @@ class SearchParser:
         category = item['price']['product']['subcategory']['category']['name']
         item_type = item['price']['product']['subcategory']['name']
         parsed[name] = {
+            'name': name,
             'brand': brand,
             'price': sale_price,
             'url': self.build_url(name, brand, item['price']['product']['product_id']),
