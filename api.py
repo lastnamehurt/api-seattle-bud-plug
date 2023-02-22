@@ -17,6 +17,7 @@ origins = [
     "https://seattlebudplug.com",
     "https://www.seattlebudplug.com",
     "https://seattle-bud-plug.herokuapp.com",
+    "https://api.seattlebudplug.com",
 ]
 
 app.add_middleware(
@@ -28,7 +29,7 @@ app.add_middleware(
 )
 
 
-@app.get("/api/deals/cached")
+@app.get("/v1/products/cached")
 async def get_cached_deals():
     keys = service.redis.keys("*")
     deals = []
@@ -45,7 +46,7 @@ async def get_cached_deals():
     return JSONResponse(content=service.collection_items, media_type="application/json")
 
 
-@app.get("/api/deals")
+@app.get("/v1/products")
 async def root():
     data = service.run()
     return JSONResponse(content=data, media_type="application/json")
