@@ -2,7 +2,7 @@
 import os
 import redis
 import time
-from .services import SearchService
+from app.services import SearchService
 from rq import Worker, Queue, Connection
 from datetime import datetime, timedelta
 
