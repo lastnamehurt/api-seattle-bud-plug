@@ -19,7 +19,7 @@ start:
 
 # run local
 debug:
-	uvicorn api:app --host 0.0.0.0 --port 8000
+	uvicorn src.api:app --host 0.0.0.0 --port 8000
 
 compose:
 	docker-compose up -d

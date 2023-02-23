@@ -1,2 +1,2 @@
-web: uvicorn api:app --reload --host 0.0.0.0 --port $PORT
-worker: python worker.py
+web: uvicorn src.api:app --reload --host 0.0.0.0 --port $PORT
+worker: python src/worker.py

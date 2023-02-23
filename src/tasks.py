@@ -1,4 +1,4 @@
-from services import SearchService
+from src.services import SearchService
 
 
 def search_deals_task():

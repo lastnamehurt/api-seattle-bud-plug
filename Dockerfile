@@ -18,4 +18,4 @@ ENV PORT=8000
 EXPOSE $PORT
 
 # Start the app using a shell script
-CMD uvicorn api:app --host 0.0.0.0 --port $PORT
+CMD uvicorn src.api:app --host 0.0.0.0 --port $PORT

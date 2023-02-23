@@ -1,8 +1,10 @@
 import os
-import redis
 import time
-from rq import Queue, Connection
 from datetime import datetime, timedelta, timezone
+
+import redis
+from rq import Connection, Queue
+
 from tasks import search_deals_task
 
 # Set up the Redis connection and queue
