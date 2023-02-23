@@ -18,6 +18,7 @@ origins = [
     "https://www.seattlebudplug.com",
     "https://seattle-bud-plug.herokuapp.com",
     "https://api.seattlebudplug.com",
+    "http://api.settlebudplug.com"
 ]
 
 app.add_middleware(
