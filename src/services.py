@@ -1,10 +1,18 @@
-import logging
-import requests
 import json
+import logging
+import os
 import pickle
-from redis import Redis
 from typing import Dict, List
+
+import redis
+import requests
 from fastapi.encoders import jsonable_encoder
+
+redis_url = os.environ.get(
+    "REDIS_URL",
+    "redis://:pe0c9599ef23a3ef81ec5489038a1b9225b7fa21adf5c7aff295dc2cc32b88e0c@ec2-44-205-74-123.compute-1.amazonaws.com:26119",
+)
+redis_client = redis.from_url(redis_url)
 
 
 class SearchService:
@@ -14,7 +22,7 @@ class SearchService:
         self.parsed_items = []
         self.location = location
         self.url = "https://api.olla.co/v1/collections/?storeLocation=e6fc8d53-19ea-4ad6-9786-c85ba9381e7c&minimum&includeCollectionItems&limit=50&includeSalePrice"
-        self.redis = Redis(host="localhost", port=6379, db=0)
+        self.redis = redis_client
 
         # Create a logger instance
         self.logger = logging.getLogger(__name__)
@@ -71,12 +79,27 @@ class SearchService:
             self.logger.warning(f'Key "{item_name}" not found in Redis.')
         return value
 
+    def load_all_from_redis_parsed(self):
+        keys = self.redis.keys("*")
+        values = []
+        for key in keys:
+            value = self.load_from_redis(key)
+            values.append(value)
+        self.logger.info("Retrieved all values from Redis.")
+
+        # parse all
+        import pdb
+
+        pdb.set_trace()
+        for val in values:
+            for item in val:
+                parsed = self.parse_item_to_deal(item)
+        return parsed
+
     def run(self, use_cache=False):
         if use_cache:
-            if not self.parsed_items:
-                self.parse_items()
             self.logger.info("Retrieved parsed items from cache.")
-            return self.parsed_items
+            return self.load_all_from_redis_parsed()
 
         deals = []
         self.fetch_collections()
@@ -111,6 +134,7 @@ class SearchParser:
 
     def parse(self, item):
         parsed = {}
+        print(item)
         name = item["price"]["product"]["name"]
         brand = item["price"]["product"]["brand"]
         sale_price = item["sale_usd"]

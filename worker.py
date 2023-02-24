@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 import redis
 from rq import Connection, Queue
 
-from tasks import search_deals_task
+from src.tasks import search_deals_task
 
 # Set up the Redis connection and queue
 redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")

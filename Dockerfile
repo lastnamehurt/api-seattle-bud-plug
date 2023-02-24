@@ -2,7 +2,7 @@
 FROM --platform=linux/amd64 python:3.9-slim
 
 # Set the working directory to /app
-WORKDIR /app
+WORKDIR /src
 
 # Copy the requirements file into the container and install the dependencies
 COPY requirements.txt .

@@ -50,7 +50,7 @@ app.add_middleware(
 
 @app.get("/v1/products")
 async def get_cached_products_parsed():
-    service.parse_items()
+    service.run(use_cache=True)
     logger.info("Retrieved cached products.")
     return JSONResponse(content=service.parsed_items, media_type="application/json")
 
