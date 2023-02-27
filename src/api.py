@@ -5,7 +5,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from .services import SearchService
+from .services.bud_finder import BudFinder
 
 # Create a logger instance
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 # Instantiate service and app
-service = SearchService()
+service = BudFinder()
 app = FastAPI()
 
 # Configure CORS settings
@@ -50,22 +50,15 @@ app.add_middleware(
 
 @app.get("/v1/products")
 async def get_cached_products_parsed():
-    service.parse_items()
+    service.run(use_cache=True)
     logger.info("Retrieved cached products.")
     return JSONResponse(content=service.parsed_items, media_type="application/json")
 
 
-@app.get("/v1/products/cached")
-async def get_cached_deals():
-    logger.info("Retrieved cached deals.")
-    return JSONResponse(content=service.collection_items, media_type="application/json")
-
-
 @app.get("/v1/products/fetch")
 async def root():
-    data = service.run()
-    logger.info("Retrieved fresh products.")
-    return JSONResponse(content=data, media_type="application/json")
+    logger.info("Retrieving fresh products.")
+    return JSONResponse(content=service.run(), media_type="application/json")
 
 
 @app.get("/redis/{key}")
@@ -81,10 +74,4 @@ async def get_value_from_redis(key: str):
 
 @app.get("/redis")
 async def get_all_values_from_redis():
-    keys = service.redis.keys("*")
-    values = []
-    for key in keys:
-        value = service.load_from_redis(key)
-        values.append({"key": key, "value": value})
-    logger.info("Retrieved all values from Redis.")
-    return values
+    return service.get_redis_store()
