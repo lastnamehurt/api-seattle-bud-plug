@@ -88,9 +88,6 @@ class SearchService:
         self.logger.info("Retrieved all values from Redis.")
 
         # parse all
-        import pdb
-
-        pdb.set_trace()
         for val in values:
             for item in val:
                 parsed = self.parse_item_to_deal(item)
