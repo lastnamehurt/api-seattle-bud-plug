@@ -8,7 +8,7 @@ class KempsCannabisParser:
         self.logger.setLevel(logging.DEBUG)
 
         # Create a handler that writes logs to a file
-        handler = logging.FileHandler("kemps_cannabis_parser.log")
+        handler = logging.FileHandler("./src/logs/kemps_cannabis_parser.log")
         handler.setLevel(logging.DEBUG)
 
         # Create a formatter that adds a timestamp to each log message
