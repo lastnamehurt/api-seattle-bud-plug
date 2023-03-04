@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 # Create a handler that writes logs to a file
-handler = logging.FileHandler("app.log")
+handler = logging.FileHandler("./src/logs/app.log")
 handler.setLevel(logging.DEBUG)
 
 # Create a formatter that adds a timestamp to each log message
@@ -63,7 +63,7 @@ async def root():
 
 @app.get("/redis/{key}")
 async def get_value_from_redis(key: str):
-    value = service.load_from_redis(key)
+    value = service.retrieve_from_redis(key)
     if value is None:
         logger.warning(f'Key "{key}" not found in Redis.')
         return {"message": "Key not found"}

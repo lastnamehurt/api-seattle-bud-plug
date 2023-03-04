@@ -1,10 +1,17 @@
+import os
 import logging
 import pickle
 
 import requests
-from redis import Redis
+import redis
 
 from src.parsers.kemps_cannabis import KempsCannabisParser
+
+redis_url = os.environ.get(
+    "REDIS_URL",
+    "redis://:pe0c9599ef23a3ef81ec5489038a1b9225b7fa21adf5c7aff295dc2cc32b88e0c@ec2-44-205-74-123.compute-1.amazonaws.com:26119",
+)
+redis_client = redis.from_url(redis_url)
 
 
 class BudFinder:
@@ -15,7 +22,7 @@ class BudFinder:
         self.parsed_items = []
         self.location = location
         self.url = BudFinder.API_URL
-        self.redis = Redis(host="localhost", port=6379, db=0)
+        self.redis = redis_client
 
         self._configure_logger()
 
@@ -23,7 +30,7 @@ class BudFinder:
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
 
-        handler = logging.FileHandler("bud_finder.log")
+        handler = logging.FileHandler("./src/logs/bud_finder.log")
         handler.setLevel(logging.DEBUG)
 
         formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
@@ -65,7 +72,10 @@ class BudFinder:
         return self.redis.set(key, pickle.dumps(value))
 
     def retrieve_from_redis(self, key):
-        return pickle.loads(self.redis.get(key))
+        try:
+            return pickle.loads(self.redis.get(key))
+        except Exception as error:
+            raise error
 
     def normalize_redis_store_to_parsed_items(self):
         locations_store = self.get_redis_store()
