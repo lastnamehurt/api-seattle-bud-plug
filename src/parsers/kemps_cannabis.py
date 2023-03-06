@@ -1,4 +1,5 @@
 import logging
+from src.services.locations import locations
 
 
 class KempsCannabisParser:
@@ -49,6 +50,7 @@ class KempsCannabisParser:
             "category": category,
             "type": item_type,
             "location_id": location_id,
+            "location": locations[location_id],
             "image": image
         }
         self.logger.info(f"Parsed item {name} into deal: {parsed[name]}.")
