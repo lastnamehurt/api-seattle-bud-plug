@@ -35,6 +35,7 @@ class KempsCannabisParser:
         category = item["price"]["product"]["subcategory"]["category"]["name"]
         item_type = item["price"]["product"]["subcategory"]["name"]
         location_id = item["price"]["store_location_id"]
+        image = item["price"]["product"]["default_image"]
         parsed[name] = {
             "id": item["id"],
             "name": name,
@@ -48,6 +49,7 @@ class KempsCannabisParser:
             "category": category,
             "type": item_type,
             "location_id": location_id,
+            "image": image
         }
         self.logger.info(f"Parsed item {name} into deal: {parsed[name]}.")
         return parsed
