@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 # Create a handler that writes logs to a file
-handler = logging.FileHandler("./src/logs/app.log")
+handler = logging.FileHandler("app.log")
 handler.setLevel(logging.DEBUG)
 
 # Create a formatter that adds a timestamp to each log message

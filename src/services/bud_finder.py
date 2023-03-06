@@ -1,27 +1,28 @@
-import os
 import logging
+import os
 import pickle
 
-import requests
 import redis
+import requests
 
 from src.parsers.kemps_cannabis import KempsCannabisParser
+from src.services.locations import LocationsMapper
 
 redis_url = os.environ.get(
     "REDIS_URL",
     "redis://:pe0c9599ef23a3ef81ec5489038a1b9225b7fa21adf5c7aff295dc2cc32b88e0c@ec2-44-205-74-123.compute-1.amazonaws.com:26119",
 )
 redis_client = redis.from_url(redis_url)
-
+default_location_id = list(LocationsMapper.locations_map.keys())[0]
 
 class BudFinder:
-    API_URL = "https://api.olla.co/v1/collections/?storeLocation=e6fc8d53-19ea-4ad6-9786-c85ba9381e7c&minimum&includeCollectionItems&limit=50&includeSalePrice"
 
-    def __init__(self, location: str = "Kemps") -> None:
+    def __init__(self, location: str = "Belltown", location_id=default_location_id) -> None:
         self.raw_collection = {}
         self.parsed_items = []
         self.location = location
-        self.url = BudFinder.API_URL
+        self.location_id = location_id
+        self.url = f"https://api.olla.co/v1/collections/?storeLocation={location_id}&minimum&includeCollectionItems&limit=50&includeSalePrice"
         self.redis = redis_client
 
         self._configure_logger()
@@ -48,7 +49,7 @@ class BudFinder:
         data = response.json().get("collections", [])
 
         if data:
-            self.store_to_redis(self.location, data)
+            self.store_to_redis(LocationsMapper.locations_map[self.location_id], data)
             self.raw_collection = data
 
         self.normalize_redis_store_to_parsed_items()
@@ -69,18 +70,25 @@ class BudFinder:
         return self.parsed_items
 
     def store_to_redis(self, key, value):
+        self.logger.info(f"Storing {key} to Redis.")
         return self.redis.set(key, pickle.dumps(value))
 
     def retrieve_from_redis(self, key):
         try:
-            return pickle.loads(self.redis.get(key))
+            value = pickle.loads(self.redis.get(key))
+            self.logger.info(f"Retrieved {key} from Redis.")
+            return value
         except Exception as error:
+            self.logger.error(f"Error retrieving {key} from Redis: {error}")
             raise error
 
     def normalize_redis_store_to_parsed_items(self):
-        locations_store = self.get_redis_store()
         self.parsed_items = []
+        locations_store = self.get_redis_store()
 
+        if len(locations_store) == 0:
+            return {}
+        
         for location in locations_store:
             collections = location['value']
 
